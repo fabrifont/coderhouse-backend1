@@ -41,12 +41,39 @@ class ProductManager {
 			if (this.products.length === 0) throw new Error("No products available");
 			if (!(property in this.products[0].keys))
 				throw new Error("Invalid property");
+
 			const id_list = this.products.map((product) => product.id);
 			const productIndex = id_list.indexOf(id);
 			this.products[productIndex][property] = value;
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	async save(file) {
+		const added_content = this.products.join(", ");
+		try {
+			const old_content = await fs.readFile(file);
+			const updated_content =
+				old_content.replace("]", ", ") + added_content.join(", ");
+			await fs.writeFile(file, updated_content);
+		} catch (error) {
+			// if the file does not exist, create it
+			if (error.code === "ENOENT") {
+				const content = "[" + updated_content.join(", ") + "]";
+				await fs.writeFile(file, content);
+			} else {
+				throw error;
+			}
+		}
+	}
+
+	async load(file) {
+		const fs = require("node:fs/promises");
+		try {
+			if (!(await fs.access(file))) {
+			}
+		} catch (error) {}
 	}
 }
 
@@ -82,6 +109,24 @@ class CartManager {
 			}
 		} catch (error) {
 			console.error(error);
+		}
+	}
+
+	async save(file) {
+		const added_content = this.carts.join(", ");
+		try {
+			const old_content = await fs.readFile(file);
+			const updated_content =
+				old_content.replace("]", ", ") + added_content.join(", ");
+			await fs.writeFile(file, updated_content);
+		} catch (error) {
+			// if the file does not exist, create it
+			if (error.code === "ENOENT") {
+				const content = "[" + updated_content.join(", ") + "]";
+				await fs.writeFile(file, content);
+			} else {
+				throw error;
+			}
 		}
 	}
 }
