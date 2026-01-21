@@ -51,29 +51,22 @@ class ProductManager {
 	}
 
 	async save(file) {
-		const added_content = this.products.join(", ");
 		try {
-			const old_content = await fs.readFile(file);
-			const updated_content =
-				old_content.replace("]", ", ") + added_content.join(", ");
-			await fs.writeFile(file, updated_content);
+			const products = this.products;
+			const data = JSON.stringify(products, null, 2);
+			await fs.writeFile(file, data);
 		} catch (error) {
-			// if the file does not exist, create it
-			if (error.code === "ENOENT") {
-				const content = "[" + updated_content.join(", ") + "]";
-				await fs.writeFile(file, content);
-			} else {
-				throw error;
-			}
+			throw error;
 		}
 	}
 
 	async load(file) {
-		const fs = require("node:fs/promises");
 		try {
-			if (!(await fs.access(file))) {
-			}
-		} catch (error) {}
+			const data = await fs.readFile(file);
+			this.products = JSON.parse(data);
+		} catch (error) {
+			throw error;
+		}
 	}
 }
 
@@ -113,20 +106,21 @@ class CartManager {
 	}
 
 	async save(file) {
-		const added_content = this.carts.join(", ");
 		try {
-			const old_content = await fs.readFile(file);
-			const updated_content =
-				old_content.replace("]", ", ") + added_content.join(", ");
-			await fs.writeFile(file, updated_content);
+			const products = this.carts;
+			const data = JSON.stringify(products, null, 2);
+			await fs.writeFile(file, data);
 		} catch (error) {
-			// if the file does not exist, create it
-			if (error.code === "ENOENT") {
-				const content = "[" + updated_content.join(", ") + "]";
-				await fs.writeFile(file, content);
-			} else {
-				throw error;
-			}
+			throw error;
+		}
+	}
+
+	async load(file) {
+		try {
+			const data = await fs.readFile(file);
+			this.products = JSON.parse(data);
+		} catch (error) {
+			throw error;
 		}
 	}
 }
