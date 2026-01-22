@@ -1,6 +1,6 @@
-const fs = require("node:fs/promises");
+import { promises as fs } from "fs";
 
-class ProductManager {
+export class ProductManager {
 	constructor() {
 		this.products = [];
 	}
@@ -72,7 +72,7 @@ class ProductManager {
 	}
 }
 
-class CartManager {
+export class CartManager {
 	constructor() {
 		this.carts = [];
 	}
@@ -127,4 +127,4 @@ class CartManager {
 	}
 }
 
-modules.export = { ProductManager, CartManager };
+// modules.export = { ProductManager, CartManager };
