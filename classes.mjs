@@ -47,10 +47,16 @@ export class ProductManager {
 		return this.products;
 	}
 
-	getProductById(id) {
-		const id_list = this.products.map((product) => product.id);
-		const productIndex = id_list.indexOf(id);
-		return this.products[productIndex];
+	getProductById(stringId) {
+		try {
+			const id = Number(stringId);
+			const idList = this.products.map((product) => product.id);
+			const productIndex = idList.indexOf(id);
+			if (productIndex === -1) throw new Error("Product not found");
+			return this.products[productIndex];
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	deleteProduct(id) {

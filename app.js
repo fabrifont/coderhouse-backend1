@@ -3,6 +3,7 @@ import express from "express";
 
 const app = express();
 const PORT = 3000;
+app.use(express.json());
 let products = [];
 let carts = [];
 
@@ -13,12 +14,19 @@ const cartManager = new CartManager();
 //    GET /:
 //    Debe listar todos los productos de la base de datos.
 app.get("/", (req, res) => {
-	res.send(productManager.products);
 	console.log("Petición GET / recibida");
+	res.send(productManager.products);
 });
 
 //    GET /:pid:
 //    Debe traer solo el producto con el id proporcionado.
+app.get("/:pid", (req, res) => {
+	console.log("Petición GET /:pid recibida");
+	const pid = req.params.pid;
+	const requestedProduct = productManager.getProductById(pid);
+	if (requestedProduct == undefined) res.send("Product not found");
+	res.send(requestedProduct);
+});
 
 //    POST /:
 /*    Debe agregar un nuevo producto con los siguientes campos:
@@ -40,9 +48,18 @@ app.get("/", (req, res) => {
 
         thumbnails: Array de Strings (rutas donde están almacenadas las imágenes del producto).
 */
-
+app.post("/", (req, res) => {
+	console.log("Petición POST / recibida");
+	try {
+		const new_product = req.body;
+		productManager.addProduct(new_product);
+		res.send();
+	} catch (error) {
+		res.send(error);
+	}
+});
 //    PUT /:pid:
-//    Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el idal momento de hacer la actualización.
+//    Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el id al momento de hacer la actualización.
 
 //    DELETE /:pid:
 //    Debe eliminar el producto con el pid indicado.
