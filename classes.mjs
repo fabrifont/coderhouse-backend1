@@ -6,15 +6,38 @@ export class ProductManager {
 	}
 
 	addProduct(product) {
+		console.log("entre a addProduct");
+		const productAttributes = [
+			"id",
+			"title",
+			"description",
+			"price",
+			"thumbnails",
+			"status",
+			"code",
+			"stock",
+			"category",
+		].sort();
 		try {
+			let receivedKeys = Object.keys(product);
+			receivedKeys.push("id");
+			receivedKeys.sort();
+
+			// since in js you can't compare two arrays using == or ===,
+			// using JSON.stringify in each is the easiest alternative
+			if (JSON.stringify(receivedKeys) != JSON.stringify(productAttributes))
+				throw new Error("Invalid received attributes in request body");
+
 			this.products.push({
 				id: this.products.length + 1,
 				title: product.title,
 				description: product.description,
 				price: product.price,
-				thumbnail: product.thumbnail,
+				thumbnails: product.thumbnail,
 				code: product.code,
 				stock: product.stock,
+				status: product.status,
+				category: product.category,
 			});
 		} catch (error) {
 			console.error(error);
