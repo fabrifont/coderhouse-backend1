@@ -82,6 +82,12 @@ app.put("/:pid", (req, res) => {
 
 //    DELETE /:pid:
 //    Debe eliminar el producto con el pid indicado.
+app.delete("/:pid", (req, res) => {
+	console.log(`Petición DELETE /${req.params.pid} recibida`);
+	const pid = req.params.pid;
+	productManager.deleteProduct(pid);
+	res.send();
+});
 
 //Rutas para Manejo de Carritos (/api/carts/)
 

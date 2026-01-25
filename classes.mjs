@@ -61,22 +61,29 @@ export class ProductManager {
 		}
 	}
 
-	deleteProduct(id) {
-		const id_list = this.products.map((product) => product.id);
-		const productIndex = id_list.indexOf(id);
-		this.products.remove(productIndex);
+	deleteProduct(idString) {
+		try {
+			const id = Number(idString);
+			const id_list = this.products.map((product) => product.id);
+			const productIndex = id_list.indexOf(id);
+			if (productIndex < 0) throw new Error(`Product with ID ${id} not found`);
+			this.products.splice(productIndex, 1);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	updateProduct(idString, attribute, value) {
 		try {
 			const id = Number(idString);
+			const id_list = this.products.map((product) => product.id);
+			const productIndex = id_list.indexOf(id);
+			if (productIndex < 0) throw new Error(`Product with ID ${id} not found`);
 			if (attribute === "id") throw new Error("ID is not modifiable");
 			if (!this.products.length) throw new Error("No products available");
 			if (!this.productAttributes.includes(attribute)) {
 				throw new Error(`Invalid attribute: ${attribute}`);
 			}
-			const id_list = this.products.map((product) => product.id);
-			const productIndex = id_list.indexOf(id);
 			this.products[productIndex][attribute] = value;
 		} catch (error) {
 			console.error(error);
