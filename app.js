@@ -61,6 +61,25 @@ app.post("/", (req, res) => {
 //    PUT /:pid:
 //    Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el id al momento de hacer la actualización.
 
+// TO DO: ARREGLAR CONDICION DEL ERROR DE INVALID PROPERTY EN EL MÉTODO.
+app.put("/:pid", (req, res) => {
+	console.log(`Petición PUT /${req.params.pid} recibida`);
+	try {
+		const body = req.body;
+		const pid = req.params.pid;
+		const keys = Object.keys(body);
+		const values = Object.values(body);
+		const amount = keys.length;
+		for (let i = 0; i < amount; i++) {
+			productManager.updateProduct(pid, keys[i], values[i]);
+		}
+		res.send();
+	} catch (error) {
+		console.error(error);
+		res.send(error);
+	}
+});
+
 //    DELETE /:pid:
 //    Debe eliminar el producto con el pid indicado.
 

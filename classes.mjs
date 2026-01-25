@@ -3,10 +3,7 @@ import { promises as fs } from "fs";
 export class ProductManager {
 	constructor() {
 		this.products = [];
-	}
-
-	addProduct(product) {
-		const productAttributes = [
+		this.productAttributes = [
 			"id",
 			"title",
 			"description",
@@ -17,6 +14,9 @@ export class ProductManager {
 			"stock",
 			"category",
 		].sort();
+	}
+
+	addProduct(product) {
 		try {
 			let receivedKeys = Object.keys(product);
 			receivedKeys.push("id");
@@ -24,7 +24,9 @@ export class ProductManager {
 
 			// since in js you can't compare two arrays using == or ===,
 			// using JSON.stringify in each is the easiest alternative
-			if (JSON.stringify(receivedKeys) != JSON.stringify(productAttributes))
+			if (
+				JSON.stringify(receivedKeys) != JSON.stringify(this.productAttributes)
+			)
 				throw new Error("Invalid received attributes in request body");
 
 			this.products.push({
@@ -65,16 +67,17 @@ export class ProductManager {
 		this.products.remove(productIndex);
 	}
 
-	updateProduct(id, property, value) {
+	updateProduct(idString, attribute, value) {
 		try {
-			if (property === "id") throw new Error("ID is not modifiable");
-			if (this.products.length === 0) throw new Error("No products available");
-			if (!(property in this.products[0].keys))
-				throw new Error("Invalid property");
-
+			const id = Number(idString);
+			if (attribute === "id") throw new Error("ID is not modifiable");
+			if (!this.products.length) throw new Error("No products available");
+			if (!this.productAttributes.includes(attribute)) {
+				throw new Error(`Invalid attribute: ${attribute}`);
+			}
 			const id_list = this.products.map((product) => product.id);
 			const productIndex = id_list.indexOf(id);
-			this.products[productIndex][property] = value;
+			this.products[productIndex][attribute] = value;
 		} catch (error) {
 			console.error(error);
 		}
