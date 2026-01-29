@@ -151,7 +151,10 @@ app.post("/carts/:cid/product/:pid", (req, res) => {
 // ----------------------------  Server Side Rendering (Handlebars)  ---------------------------------------
 
 app.get("/", (req, res) => {
-	res.render("index", { layout: "main.handlebars" });
+	res.render("index", {
+		layout: "main.handlebars",
+		products: productManager.products,
+	});
 });
 
 // ---------------------------------------------------------------------------------------------------------
