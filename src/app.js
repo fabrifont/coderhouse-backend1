@@ -1,7 +1,7 @@
 import { ProductManager, CartManager } from "./classes.mjs";
 import express from "express";
 import handlebars from "express-handlebars";
-import productsRouter from "./productsRouter";
+import productsRouter from "./routers/productsRouter";
 const __dirname = import.meta.dirname;
 
 const app = express();
