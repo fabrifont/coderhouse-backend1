@@ -1,23 +1,32 @@
 import express from "express";
+import console from "node:console";
 
-export default function productsRouter(productManager) {
+export default function productsRouter(Product) {
 	const router = express.Router();
 
 	//    GET /products/
 	//    Debe listar todos los productos de la base de datos.
-	router.get("/", (req, res) => {
-		console.log("Petición GET /products/ recibida");
-		res.send(productManager.products);
+	router.get("/", async (req, res) => {
+		try {
+			console.log("Petición GET /products/ recibida");
+			const products = await Product.find({});
+			res.send(products);
+		} catch (error) {
+			console.error(error);
+		}
 	});
 
 	//    GET /products/:pid
 	//    Debe traer solo el producto con el id proporcionado.
-	router.get("/:pid", (req, res) => {
-		console.log("Petición GET /products/:pid recibida");
-		const pid = req.params.pid;
-		const requestedProduct = productManager.getProductById(pid);
-		if (requestedProduct == undefined) res.send("Product not found");
-		res.send(requestedProduct);
+	router.get("/:pid", async (req, res) => {
+		try {
+			console.log("Petición GET /products/:pid recibida");
+			const pid = req.params.pid;
+			const requestedProduct = await Product.findById(pid);
+			res.send(requestedProduct);
+		} catch (error) {
+			console.error(error);
+		}
 	});
 
 	//    POST /products/
@@ -33,12 +42,20 @@ export default function productsRouter(productManager) {
             thumbnails: Array de Strings (rutas donde están almacenadas las imágenes del producto).
 */
 	router.post("/", async (req, res) => {
-		console.log("Petición POST /products/ recibida");
 		try {
-			const new_product = req.body;
-			productManager.addProduct(new_product);
-			await productManager.save("./products.json");
-			req.app.render(
+			console.log("Petición POST /products/ recibida");
+			const newProduct = req.body;
+			const productDocument = new Product();
+			productDocument.title = newProduct.title;
+			productDocument.description = newProduct.description;
+			productDocument.price = newProduct.price;
+			productDocument.thumbnails = newProduct.thumbnails;
+			productDocument.code = newProduct.code;
+			productDocument.stock = newProduct.stock;
+			productDocument.status = newProduct.status;
+			productDocument.category = newProduct.category;
+			await productDocument.save();
+			/* req.app.render(
 				"index",
 				{
 					products: productManager.products,
@@ -46,7 +63,8 @@ export default function productsRouter(productManager) {
 				(err, html) => {
 					req.io.emit("update-list", html);
 				},
-			);
+			); */
+
 			res.send();
 		} catch (error) {
 			res.send(error);
@@ -60,14 +78,8 @@ export default function productsRouter(productManager) {
 		try {
 			const body = req.body;
 			const pid = req.params.pid;
-			const keys = Object.keys(body);
-			const values = Object.values(body);
-			const amount = keys.length;
-			for (let i = 0; i < amount; i++) {
-				productManager.updateProduct(pid, keys[i], values[i]);
-			}
-			await productManager.save("products.json");
-			req.app.render(
+			await Product.findByIdAndUpdate(pid, body);
+			/* req.app.render(
 				"index",
 				{
 					products: productManager.products,
@@ -75,7 +87,7 @@ export default function productsRouter(productManager) {
 				(err, html) => {
 					req.io.emit("update-list", html);
 				},
-			);
+			); */
 			res.send();
 		} catch (error) {
 			console.error(error);
@@ -88,9 +100,8 @@ export default function productsRouter(productManager) {
 	router.delete("/:pid", async (req, res) => {
 		console.log(`Petición DELETE /products/${req.params.pid} recibida`);
 		const pid = req.params.pid;
-		productManager.deleteProduct(pid);
-		await productManager.save("./products.json");
-		req.app.render(
+		await Product.findByIdAndDelete(pid);
+		/* req.app.render(
 			"index",
 			{
 				products: productManager.products,
@@ -98,7 +109,7 @@ export default function productsRouter(productManager) {
 			(err, html) => {
 				req.io.emit("update-list", html);
 			},
-		);
+		); */
 		res.send();
 	});
 

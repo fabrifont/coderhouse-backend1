@@ -1,4 +1,5 @@
-import { ProductManager, CartManager } from "./classes.mjs";
+// ----------------------------  Importación de dependencias  ---------------------------------------
+
 import express from "express";
 import handlebars from "express-handlebars";
 import productsRouter from "./routers/productsRouter.js";
@@ -7,8 +8,12 @@ import viewsRouter from "./routers/viewsRouter.js";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 import path from "node:path";
-const __dirname = import.meta.dirname;
+import mongoose from "mongoose";
+import { Product, Cart } from "./models.js";
 
+// ----------------------------  Configuración inicial del servidor  ---------------------------------------
+
+const __dirname = import.meta.dirname;
 const app = express();
 const http = createServer(app);
 const io = new Server(http);
@@ -23,21 +28,30 @@ app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "views"));
 
+// ----------------------------  Mongoose: conexión con MongoDB  ---------------------------------------
+
+async function connectToMongoDB() {
+	try {
+		await mongoose.connect("mongodb://127.0.0.1:27017/ecommerce-coderhouse");
+		console.log("Conexión con MongoDB establecida");
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+connectToMongoDB();
+
 // ----------------------------  API: Manejo de productos  ---------------------------------------
 
-const productManager = new ProductManager();
-productManager.load("./products.json");
-app.use("/api/products", productsRouter(productManager));
+app.use("/api/products", productsRouter(Product));
 
 // ----------------------------  API: Manejo de carritos  ---------------------------------------
 
-const cartManager = new CartManager();
-cartManager.load("./carts.json");
-app.use("/api/carts", cartsRouter(cartManager));
+app.use("/api/carts", cartsRouter(Cart));
 
 // ----------------------------  Server Side Rendering (Handlebars)  ---------------------------------------
 
-app.use("/", viewsRouter(productManager));
+//app.use("/", viewsRouter(productManager));
 
 // ----------------------------  API: Conexiones WebSockets  ---------------------------------------
 

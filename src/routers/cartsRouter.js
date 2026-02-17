@@ -1,6 +1,7 @@
 import express from "express";
+import mongoose from "mongoose";
 
-export default function cartsRouter(cartManager) {
+export default function cartsRouter(Cart) {
 	const router = express.Router();
 
 	//    POST /carts/
@@ -11,17 +12,17 @@ export default function cartsRouter(cartManager) {
 
 	router.post("/", async (req, res) => {
 		console.log(`Petición POST /carts/ recibida`);
-		cartManager.addCart();
-		await cartManager.save("./carts.json");
+		const newCart = new Cart();
+		newCart.save();
 		res.send();
 	});
 
 	//    GET /carts/:cid
 	//    Debe listar los productos que pertenecen al carrito con el cid proporcionado.
-	router.get("/:cid", (req, res) => {
+	router.get("/:cid", async (req, res) => {
 		console.log(`Petición GET /carts/${req.params.cid} recibida`);
 		const cid = req.params.cid;
-		const cart = cartManager.getCart(cid);
+		const cart = await Cart.findById(cid);
 		res.send(cart);
 	});
 
@@ -37,9 +38,8 @@ export default function cartsRouter(cartManager) {
 		try {
 			const cid = req.params.cid;
 			const pid = req.params.pid;
-			console.log(`Petición GET /carts/${cid}/product/${pid} recibida`);
-			cartManager.addProductToCart(cid, pid, productManager);
-			await cartManager.save("./carts.json");
+			const cart = await Cart.findById(cid);
+			await cart.addProduct(pid);
 			res.send();
 		} catch (error) {
 			console.error(error);
